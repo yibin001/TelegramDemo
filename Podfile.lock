@@ -1,0 +1,89 @@
+PODS:
+  - AppBundle (2.2)
+  - AsyncDisplayKit (3.2.0)
+  - ComponentFlow (2.2):
+    - Display
+  - Display (2.2):
+    - AppBundle
+    - AsyncDisplayKit
+    - Markdown
+    - ObjCRuntimeUtils
+    - SwiftSignalKit
+    - UIKitRuntimeUtils
+  - HierarchyTrackingLayer (2.2)
+  - ManagedFile (2.2):
+    - SwiftSignalKit
+  - Markdown (2.2)
+  - MergeLists (2.2)
+  - MultilineTextComponent (2.2):
+    - ComponentFlow
+    - Display
+    - Markdown
+  - ObjCRuntimeUtils (2.2)
+  - SSignalKit (2.2)
+  - SwiftSignalKit (2.2)
+  - UIKitRuntimeUtils (2.2):
+    - AsyncDisplayKit
+    - ObjCRuntimeUtils
+
+DEPENDENCIES:
+  - AppBundle (from `TelegramModules/AppBundle`)
+  - AsyncDisplayKit (from `TelegramModules/AsyncDisplayKit`)
+  - ComponentFlow (from `TelegramModules/ComponentFlow`)
+  - Display (from `TelegramModules/Display`)
+  - HierarchyTrackingLayer (from `TelegramModules/HierarchyTrackingLayer`)
+  - ManagedFile (from `TelegramModules/ManagedFile`)
+  - Markdown (from `TelegramModules/Markdown`)
+  - MergeLists (from `TelegramModules/MergeLists`)
+  - MultilineTextComponent (from `TelegramModules/MultilineTextComponent`)
+  - ObjCRuntimeUtils (from `TelegramModules/ObjCRuntimeUtils`)
+  - SSignalKit (from `TelegramModules/SSignalKit/SSignalKit`)
+  - SwiftSignalKit (from `TelegramModules/SSignalKit/SwiftSignalKit`)
+  - UIKitRuntimeUtils (from `TelegramModules/UIKitRuntimeUtils`)
+
+EXTERNAL SOURCES:
+  AppBundle:
+    :path: TelegramModules/AppBundle
+  AsyncDisplayKit:
+    :path: TelegramModules/AsyncDisplayKit
+  ComponentFlow:
+    :path: TelegramModules/ComponentFlow
+  Display:
+    :path: TelegramModules/Display
+  HierarchyTrackingLayer:
+    :path: TelegramModules/HierarchyTrackingLayer
+  ManagedFile:
+    :path: TelegramModules/ManagedFile
+  Markdown:
+    :path: TelegramModules/Markdown
+  MergeLists:
+    :path: TelegramModules/MergeLists
+  MultilineTextComponent:
+    :path: TelegramModules/MultilineTextComponent
+  ObjCRuntimeUtils:
+    :path: TelegramModules/ObjCRuntimeUtils
+  SSignalKit:
+    :path: TelegramModules/SSignalKit/SSignalKit
+  SwiftSignalKit:
+    :path: TelegramModules/SSignalKit/SwiftSignalKit
+  UIKitRuntimeUtils:
+    :path: TelegramModules/UIKitRuntimeUtils
+
+SPEC CHECKSUMS:
+  AppBundle: 5924fed49704e45e8d6487d6875feeefc7d2fa76
+  AsyncDisplayKit: 286907e8312ecf930944204deeecf6e21d23abf9
+  ComponentFlow: b0bf99a97cac85a687b3de2388e1bd1a5d94c506
+  Display: 78d97e8e2ad9d3c85d6e5ff751261f956043679d
+  HierarchyTrackingLayer: c5e259fb6b2eef83f9a4a57b2b0c940ffe690285
+  ManagedFile: 48ae5da5ce579a861216a8f6b74800a5527a00ad
+  Markdown: ffafe907394e18b54be428c7623afbc631f615f2
+  MergeLists: 6c16b98e116eeb5144760a68cbee53caaadc2b64
+  MultilineTextComponent: 37e67c3c89f023df6cf1ad43e28ddf282910e2e4
+  ObjCRuntimeUtils: 61be96081f70a39a5bbc71e7b6f669660bb93994
+  SSignalKit: 326f16172582f08f70ef9da1f4b5e50f66730eec
+  SwiftSignalKit: 96d87c472ba3a61f71ce2f42b096f50f75933f41
+  UIKitRuntimeUtils: 892517b7b3d5ff77cbd320558af964bb24dc085d
+
+PODFILE CHECKSUM: 7d8fb9f261066272d84a88c9693099f9bd4d794d
+
+COCOAPODS: 1.15.2
