@@ -15,187 +15,51 @@ class ChatListViewModel: NSObject {
     var updateCount = 0
     var batchCount = 0
     
-    var items:[ChatListItem] = []
-    
-    var interaction: ChatListNodeInteraction
-    
-    init(interaction: ChatListNodeInteraction) {
-        self.interaction = interaction
-    }
-    
-    func createInsertItemsTranstion() -> ChatListViewTransition {
-        let count = 20
+    var cellDataArray:[ChatCellData] = []
         
-        for i in 0..<count {
-            let listViewItem = ChatListItem(interaction: self.interaction)
-            listViewItem.title = "title \(currentCount)"
-                        
-            self.items.append(listViewItem)
-            
+    func mockData() {
+        for i in 0..<20 {
+            let cellData = ChatCellData(roomid:"\(currentCount)", title: "title \(currentCount)")
+            self.cellDataArray.append(cellData)
             currentCount += 1
         }
-        
-        return self.createTestViewTransition(from: nil, to: self.items, scrollPosition: nil, stationaryItemRange: nil)
     }
-    
-    func createInsertItemsWithOneItemTransition() -> ChatListViewTransition {
-        let previousItems = self.items
-        
-        let listViewItem = ChatListItem(interaction: self.interaction)
-        listViewItem.title = "title \(currentCount)"
 
-        self.items.append(listViewItem)        
-            
+    func insertOneMockData() {
+        let cellData = ChatCellData(roomid:"\(currentCount)", title: "title \(currentCount)")
+        self.cellDataArray.append(cellData)
         currentCount += 1
-        
-        let scrollToItem = ListViewScrollToItem(index: self.items.count - 1, position: ListViewScrollPosition.bottom(0), animated: true, curve: .Default(duration: 0.1), directionHint: .Down)
-        
-        return self.createTestViewTransition(from: previousItems, to: self.items, scrollPosition: scrollToItem, stationaryItemRange: nil)
     }
-    
-    func createDeleteItemTransition(item:ChatListItem) -> ChatListViewTransition {
-        let previousItems = self.items
-        
-        let listViewItem = ChatListItem(interaction: self.interaction)
-        listViewItem.title = "title \(currentCount)"
-        
-        let itemIndex = self.items.firstIndex(of: item)
-        var stationaryIndex : Int?
-        var stationaryItemRange :(Int, Int)?
-        
-        if let index = itemIndex {
-            self.items.remove(at: index)
-            
-            stationaryIndex = index - 1
-        }
-        
-        if let stationaryIndex = stationaryIndex {
-            if stationaryIndex >= 0 {
-                stationaryItemRange = (stationaryIndex, stationaryIndex)
-            }
-                
-        }                                
 
-        let scrollToItem = ListViewScrollToItem(index: stationaryIndex ?? 0, position: ListViewScrollPosition.visible, animated: true, curve: .Default(duration: 0.1), directionHint: .Down)
-                
-        
-        return self.createTestViewTransition(from: previousItems, to: self.items, scrollPosition: scrollToItem, stationaryItemRange: stationaryItemRange)
-    }
-    
-    func createDeleteItemsTransition() -> ChatListViewTransition {
-        let previousItems = self.items
-        
-        if self.items.count > 0 {
-            self.items.removeLast()
-        }        
-        
-        let scrollToItem = ListViewScrollToItem(index: self.items.count - 1, position: ListViewScrollPosition.bottom(0), animated: true, curve: .Default(duration: 0.1), directionHint: .Down)
-        
-        return self.createTestViewTransition(from: previousItems, to: self.items, scrollPosition: scrollToItem, stationaryItemRange: nil)
-    }
-    
-    func createUpdateItemsTransition() -> ChatListViewTransition {
-        let previousItems = self.items
-        
-        let count = self.items.count
-        if self.items.count > 0 {
-            let updateViewItem = ChatListItem(interaction: self.interaction)
-            updateViewItem.id = self.items[count - 1].id
-            updateViewItem.title = "title update \(self.updateCount)"
-            self.items[count - 1] = updateViewItem
-            
-            self.updateCount += 1
-        }
-        
-        return self.createTestViewTransition(from: previousItems, to: self.items, scrollPosition: nil, stationaryItemRange: nil)
-    }
-    
-    func createBatchTransition() -> ChatListViewTransition {
-        let previousItems = self.items
-        
-        //delete
-        if self.items.count > 0 {
-            self.items.remove(at: 0)
-        }
-        
-        if self.items.count > 0 {
-            self.items.remove(at: 0)
-        }
-        
-        let count = self.items.count
-        if count > 0 {
-            //update
-            let updateViewItem = ChatListItem(interaction: self.interaction)
-            updateViewItem.id = self.items[count - 1].id
-            updateViewItem.title = "title update \(self.updateCount)"
-            self.items[count - 1] = updateViewItem
-        }
-        
-        self.updateCount += 1
-        
-        //insert
-//        let listViewItem = TestListItem()
-//        listViewItem.title = "title batch \(self.batchCount)"
-//        self.items.append(listViewItem)
-//        
-//        self.batchCount += 1
-        
-        return self.createTestViewTransition(from: previousItems, to: self.items, scrollPosition: nil, stationaryItemRange: nil)
-    }
-    
-    
-    func createTestViewTransition(from fromView: [ChatListItem]?, to toView: [ChatListItem]?, scrollPosition: ListViewScrollToItem?, stationaryItemRange: (Int, Int)?) -> ChatListViewTransition {
-        var adjustedDeleteIndices:[ListViewDeleteItem] = []
-        var adjustedIndicesAndItems:[ListViewInsertItem] = []
-        var adjustedUpdateItems:[ListViewUpdateItem] = []
-        
-        let (deleteIndices, indicesAndItems, updateIndices) = mergeListsStableWithUpdates(leftList: fromView ?? [], rightList: toView ?? [], allUpdated: false)
-        
-        for index in deleteIndices {
-            adjustedDeleteIndices.append(ListViewDeleteItem(index: index, directionHint: nil))
-        }
-        
-        for (index, entry, previousIndex) in indicesAndItems {
-            adjustedIndicesAndItems.append(ListViewInsertItem(index: index, previousIndex: previousIndex, item: entry, directionHint: nil))
-        }
-        
-        
-        for (index, entry, previousIndex) in updateIndices {
-            adjustedUpdateItems.append(ListViewUpdateItem(index: index, previousIndex: previousIndex, item: entry, directionHint: nil))
-        }
-        
-        return ChatListViewTransition(deleteItems: adjustedDeleteIndices, insertEntries: adjustedIndicesAndItems, updateEntries: adjustedUpdateItems, scrollToItem: scrollPosition, stationaryItemRange: nil)
-    }
-    
-    
-    func preparedChatListNodeViewTransition(from fromView: [ChatListItem]?, to toView: [ChatListItem]?, scrollPosition: ListViewScrollToItem?, stationaryItemRange: (Int, Int)?) -> Signal<ChatListViewTransition, NoError> {
-        
-        return Signal<ChatListViewTransition, NoError> { subscriber in
-            var adjustedDeleteIndices:[ListViewDeleteItem] = []
-            var adjustedIndicesAndItems:[ListViewInsertItem] = []
-            var adjustedUpdateItems:[ListViewUpdateItem] = []
-            
-            let (deleteIndices, indicesAndItems, updateIndices) = mergeListsStableWithUpdates(leftList: fromView ?? [], rightList: toView ?? [], allUpdated: false)
-            
-            for index in deleteIndices {
-                adjustedDeleteIndices.append(ListViewDeleteItem(index: index, directionHint: nil))
-            }
-            
-            for (index, entry, previousIndex) in indicesAndItems {
-                adjustedIndicesAndItems.append(ListViewInsertItem(index: index, previousIndex: previousIndex, item: entry, directionHint: nil))
-            }
-            
-            
-            for (index, entry, previousIndex) in updateIndices {
-                adjustedUpdateItems.append(ListViewUpdateItem(index: index, previousIndex: previousIndex, item: entry, directionHint: nil))
-            }
-            
-            subscriber.putNext(ChatListViewTransition(deleteItems: adjustedDeleteIndices, insertEntries: adjustedIndicesAndItems, updateEntries: adjustedUpdateItems, scrollToItem: scrollPosition, stationaryItemRange: stationaryItemRange))
-            subscriber.putCompletion()
-            
-            return EmptyDisposable
+    func deleteLastItem() {
+        if self.cellDataArray.count > 0 {
+            self.cellDataArray.removeLast()
         }
     }
-    
-    
+
+    func updateLastItem() {
+        if self.cellDataArray.count > 0 {
+            let lastCellData = self.cellDataArray[self.cellDataArray.count - 1]
+            let newCellData = ChatCellData(roomid:"\(lastCellData.roomid)", title: "title \(updateCount)")            
+            self.cellDataArray[self.cellDataArray.count - 1] = newCellData
+            updateCount += 1
+        }
+    }    
+
+    func batchUpdate() {
+        if self.cellDataArray.count > 0 {
+            self.cellDataArray.removeLast()
+        }
+
+        if self.cellDataArray.count > 0 {
+            let lastCellData = self.cellDataArray[self.cellDataArray.count - 1]
+            let newCellData = ChatCellData(roomid:"\(lastCellData.roomid)", title: "title \(updateCount)")            
+            self.cellDataArray[self.cellDataArray.count - 1] = newCellData
+            updateCount += 1
+        }
+
+        let cellData = ChatCellData(roomid:"\(currentCount)", title: "title \(currentCount)")
+        self.cellDataArray.append(cellData)
+        currentCount += 1        
+    }
 }

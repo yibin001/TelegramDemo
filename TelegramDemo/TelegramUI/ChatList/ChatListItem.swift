@@ -12,23 +12,22 @@ import MergeLists
 
 class ChatListItem: ListViewItem, Comparable, Identifiable {
     static func < (lhs: ChatListItem, rhs: ChatListItem) -> Bool {
-        return lhs.title < rhs.title
+        return lhs.cellData.title < rhs.cellData.title
     }
     
     static func == (lhs: ChatListItem, rhs: ChatListItem) -> Bool {
-        return lhs.title == rhs.title
+        return lhs.cellData.title == rhs.cellData.title
     }
         
     var stableId: AnyHashable {
-        return AnyHashable(self.id)
+        return self.cellData.roomid
     }
     
-    var id:UUID
-    
+    let cellData:ChatCellData
     let interaction: ChatListNodeInteraction
     
-    init(interaction: ChatListNodeInteraction) {
-        self.id = UUID()
+    init(cellData:ChatCellData, interaction: ChatListNodeInteraction) {
+        self.cellData = cellData
         self.interaction = interaction
     }
     
@@ -53,7 +52,7 @@ class ChatListItem: ListViewItem, Comparable, Identifiable {
             let endTime = Date()
             let executionTime = endTime.timeIntervalSince(startTime) * 1000
             //                print("executed: \(executionTime) ms")
-            print("create node:\(self.title)")
+            print("create node:\(self.cellData.title)")
             
             Queue.mainQueue().async {
                 completion(node, {

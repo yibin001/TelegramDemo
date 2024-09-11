@@ -32,7 +32,7 @@ private enum RevealOptionKey: Int32 {
 
 private let separatorHeight = 1.0 / UIScreen.main.scale
 
-class ChatListItemNode: ItemListRevealOptionsItemNode {
+class ChatListItemNode: ItemListRevealOptionsItemNode, UIContextMenuInteractionDelegate {
     var item: ChatListItem?
     
     private let backgroundNode: ASDisplayNode
@@ -52,6 +52,8 @@ class ChatListItemNode: ItemListRevealOptionsItemNode {
     public let separatorNode: ASDisplayNode
     
     let badgeNode: ChatListBadgeNode
+        
+    var interactionAdded = false
     
     init() {     
         self.backgroundNode = ASDisplayNode()
@@ -92,7 +94,7 @@ class ChatListItemNode: ItemListRevealOptionsItemNode {
         
         self.badgeNode = ChatListBadgeNode()
         
-        super.init(layerBacked: false, dynamicBounce: true, rotated: false, seeThrough: false)
+        super.init(layerBacked: false, dynamicBounce: false, rotated: false, seeThrough: false)
         
 //        self.backgroundColor = .blue
         self.isAccessibilityElement = true
@@ -112,10 +114,18 @@ class ChatListItemNode: ItemListRevealOptionsItemNode {
         self.mainContentContainerNode.addSubnode(self.badgeNode)
         
 //        self.mainContentContainerNode.backgroundColor = .gray
+        
     }
     
     func setupItem(item: ChatListItem) {
         self.item = item
+        
+        if !self.interactionAdded {
+            self.interactionAdded = true
+            let interaction = UIContextMenuInteraction(delegate: self)
+            self.view.addInteraction(interaction)
+        }
+        
     }
     
     deinit {
@@ -134,7 +144,7 @@ class ChatListItemNode: ItemListRevealOptionsItemNode {
             //sub thread
             
             //mock data
-            let titleStr = item.title
+            let titleStr = item.cellData.title
             let authorStr = "Micheal"
             let textStr = "Hello, I'm Micheal, are you ok?"
             let dateStr = "08/09"
@@ -236,6 +246,7 @@ class ChatListItemNode: ItemListRevealOptionsItemNode {
             return (layout, { [weak self] synchronousLoad, animated in
                 //main thread
                 if let strongSelf = self {
+                    strongSelf.backgroundColor = .brown
                     
                     let transition: ContainedViewLayoutTransition
                     if animated {
@@ -299,7 +310,11 @@ class ChatListItemNode: ItemListRevealOptionsItemNode {
                     let avatarScaleOffset: CGFloat = 0.0
                     let avatarScale: CGFloat = 1.0
 
-                    strongSelf.avatarNode.image = UIImage(named: "star")
+//                    strongSelf.avatarNode.image = UIImage(named: "star")
+//                    strongSelf.avatarNode.setImage(with: URL(string: "https://media.istockphoto.com/id/497004261/ja/%E3%82%B9%E3%83%88%E3%83%83%E3%82%AF%E3%83%95%E3%82%A9%E3%83%88/%E3%83%8B%E3%83%A3%E3%83%BC.jpg?s=1024x1024&w=is&k=20&c=LxKL5hLgBgCDjsZ0mmvUG5_dQF91ajTf_6SwU1I1MJI="))
+                    
+                    //svg image
+                    strongSelf.avatarNode.setImage(with: URL(string:"https://static.sending.me/beam/120/@sdn_8763776c166cf6ea3a3a9f5b3bedcc43b05edd76:8763776c166cf6ea3a3a9f5b3bedcc43b05edd76?colors=FC774B,FFB197,B27AFF,DAC2FB,F0E7FD&square"))
                     strongSelf.avatarNode.cornerRadius = avatarFrame.width / 2
                     strongSelf.avatarNode.clipsToBounds = true
                     transition.updateFrame(node: strongSelf.avatarContainerNode, frame: avatarFrame)
@@ -399,6 +414,21 @@ class ChatListItemNode: ItemListRevealOptionsItemNode {
             self.setRevealOptionsOpened(false, animated: true)
             self.revealOptionsInteractivelyClosed()
         }
+    }
+    
+    //long press menu
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: {
+            // preview vc
+            let previewVC = UIViewController()
+            previewVC.view.backgroundColor = .green
+            return previewVC
+        }, actionProvider: { _ in
+            // menu items
+            let action1 = UIAction(title: "操作1") { _ in print("选择了操作1") }
+            let action2 = UIAction(title: "操作2") { _ in print("选择了操作2") }
+            return UIMenu(title: "", children: [action1, action2])
+        })
     }
     
 }

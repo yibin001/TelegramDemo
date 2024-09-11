@@ -8,6 +8,13 @@
 import UIKit
 import Display
 
+struct ChatListNodeView {
+    let originalList: [ChatCellData]
+//    let filteredEntries: [ChatListNodeEntry]
+//    let isLoading: Bool
+//    let filter: ChatListFilter?
+}
+
 struct ChatListViewTransition {
 //    let chatListView: ChatListNodeView
     let deleteItems: [ListViewDeleteItem]

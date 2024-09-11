@@ -12,7 +12,7 @@ import SwiftSignalKit
 
 class ChatListViewController: UIViewController {
 
-    let listView = ListView()
+    let listView = ChatListNode()
     var viewModel:ChatListViewModel!
     
     let _contentsReady = ValuePromise<Bool>()
@@ -32,22 +32,8 @@ class ChatListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
-        
-        let interaction = ChatListNodeInteraction { item in
-            print("peer selected:\(item.title)")
-        } setItemPinned: { item, pinned in
-            print("peer pinned:\(item.title) \(pinned)")
-        } setPeerMuted: { item, muted in
-            print("peer muted:\(item.title) \(muted)")
-        } deletePeer: { item in
-            print("peer delete:\(item.title)")
-            self.deleteItems(item: item)
-        } setRead: { item, read in
-            print("peer read:\(item.title) \(read)")
-        }
-        
-        self.viewModel = ChatListViewModel(interaction: interaction)
+        // Do any additional setup after loading the view.        
+        self.viewModel = ChatListViewModel()
         
         self.view.backgroundColor = .yellow
     
@@ -84,8 +70,9 @@ class ChatListViewController: UIViewController {
         
         
         //initial item list
-        let insertItemsTranstion = self.viewModel.createInsertItemsTranstion()
-        self.updateListView(transition: insertItemsTranstion)
+        self.viewModel.mockData()
+        let initialCellDataArray = self.viewModel.cellDataArray
+        self.listView.updateDataArray(cellDataArray: initialCellDataArray)
         
     }
     
@@ -94,46 +81,54 @@ class ChatListViewController: UIViewController {
         let viewWidth = self.view.bounds.width
         
         self.listView.frame = CGRect(x: 0, y: 84, width: viewWidth, height: viewHeight - 200)
-        self.listView.backgroundColor = .brown
+        self.listView.verticalScrollIndicatorColor = .lightGray
         
         self.view.addSubnode(self.listView)
         
         let sizeAndInsets = ListViewUpdateSizeAndInsets(size: self.listView.frame.size, insets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), duration: 0, curve: .Spring(duration: 1))
         
         self.listView.transaction(deleteIndices: [], insertIndicesAndItems: [], updateIndicesAndItems: [], options: .AnimateAlpha, scrollToItem: nil, additionalScrollDistance: 0, updateSizeAndInsets: sizeAndInsets, stationaryItemRange: nil, updateOpaqueState: nil, completion: { _ in })
+
+//add listView event
+        self.listView.deletePeer = { item in
+            print("peer delete:\(item.title)")
+        }
+
+        self.listView.setItemPinned = { item, pinned in
+            print("peer pinned:\(item.title) \(pinned)")
+        }
+
+        self.listView.setPeerMuted = { item, muted in
+            print("peer muted:\(item.title) \(muted)")
+        }
+
+        self.listView.setRead = { item, read in
+            print("peer read:\(item.title) \(read)")
+        }        
+        
+        self.listView.peerSelected = { item in
+            print("peer selected:\(item.title)")
+        }
+
     }
 
     @objc func insertButtonClick() {
-        let transtion = self.viewModel.createInsertItemsWithOneItemTransition()
-                
-        self.updateListView(transition: transtion)
+        self.viewModel.insertOneMockData()
+        self.listView.updateDataArray(cellDataArray: self.viewModel.cellDataArray, scrollToIndex: self.viewModel.cellDataArray.count - 1)
     }
 
     @objc func deleteButtonClick() {
-        let transtion = self.viewModel.createDeleteItemsTransition()
-                
-        self.updateListView(transition: transtion)
+        self.viewModel.deleteLastItem()
+        self.listView.updateDataArray(cellDataArray: self.viewModel.cellDataArray, scrollToIndex: self.viewModel.cellDataArray.count - 1)
     }
 
     @objc func updateButtonClick() {
-        let transtion = self.viewModel.createUpdateItemsTransition()
-                
-        self.updateListView(transition: transtion)
+        self.viewModel.updateLastItem()
+        self.listView.updateDataArray(cellDataArray: self.viewModel.cellDataArray)
     }
 
     @objc func batchButtonClick() {
-        let transition = self.viewModel.createBatchTransition()
-        
-        self.updateListView(transition: transition)
-    }
-    
-    func updateListView(transition:ChatListViewTransition) {
-        self.listView.transaction(deleteIndices: transition.deleteItems, insertIndicesAndItems: transition.insertEntries, updateIndicesAndItems: transition.updateEntries, options: .AnimateAlpha, scrollToItem: transition.scrollToItem, stationaryItemRange: transition.stationaryItemRange, updateOpaqueState: nil)
-    }
-
-    func deleteItems(item:ChatListItem) {
-        let transition = self.viewModel.createDeleteItemTransition(item: item)
-        
-        self.updateListView(transition: transition)
+        self.viewModel.batchUpdate()
+        self.listView.updateDataArray(cellDataArray: self.viewModel.cellDataArray)
     }
 }
